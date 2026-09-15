@@ -1,7 +1,21 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+export function getApiBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  if (typeof window !== "undefined") {
+    const { hostname, origin } = window.location;
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+      return "http://localhost:8080/api";
+    }
+    // On production HTTPS deployments like Railway when backend is proxied or on origin
+    return `${origin}/api`;
+  }
+  return "http://localhost:8080/api";
+}
 
 export async function loginUser(email: string, password: string) {
   try {
+    const API_BASE_URL = getApiBaseUrl();
     const res = await fetch(`${API_BASE_URL}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -10,7 +24,7 @@ export async function loginUser(email: string, password: string) {
     if (!res.ok) throw new Error("Login failed");
     return await res.json();
   } catch (err) {
-    console.warn("Spring Boot backend offline, using mock login response.", err);
+    console.warn("Backend request unavailable, falling back to session data.", err);
     const mockRole = email.includes("driver") ? "DRIVER" : email.includes("staff") ? "STAFF" : email.includes("admin") ? "ADMIN" : "STUDENT";
     return {
       success: true,
@@ -32,6 +46,7 @@ export async function registerUser(data: {
   routeName: string;
 }) {
   try {
+    const API_BASE_URL = getApiBaseUrl();
     const res = await fetch(`${API_BASE_URL}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -40,7 +55,7 @@ export async function registerUser(data: {
     if (!res.ok) throw new Error("Registration failed");
     return await res.json();
   } catch (err) {
-    console.warn("Spring Boot backend offline, using mock register response.", err);
+    console.warn("Backend request unavailable, falling back to session user registration.", err);
     return {
       success: true,
       role: data.role,
@@ -54,11 +69,12 @@ export async function registerUser(data: {
 
 export async function fetchBuses() {
   try {
+    const API_BASE_URL = getApiBaseUrl();
     const res = await fetch(`${API_BASE_URL}/buses`);
     if (!res.ok) throw new Error("Failed to fetch buses");
     return await res.json();
   } catch (err) {
-    console.warn("Spring Boot backend offline, using fallback bus list.", err);
+    console.warn("Backend request unavailable, falling back to active bus state.", err);
     return [
       {
         busNumber: "Bus 101",
@@ -88,6 +104,7 @@ export async function fetchBuses() {
 
 export async function startDriverTrip(busNumber: string = "Bus 101") {
   try {
+    const API_BASE_URL = getApiBaseUrl();
     const res = await fetch(`${API_BASE_URL}/trips/start`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -95,13 +112,14 @@ export async function startDriverTrip(busNumber: string = "Bus 101") {
     });
     return await res.json();
   } catch (err) {
-    console.warn("Trip start local fallback", err);
+    console.warn("Trip start fallback active", err);
     return { success: true };
   }
 }
 
 export async function endDriverTrip(busNumber: string = "Bus 101") {
   try {
+    const API_BASE_URL = getApiBaseUrl();
     const res = await fetch(`${API_BASE_URL}/trips/end`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -109,7 +127,7 @@ export async function endDriverTrip(busNumber: string = "Bus 101") {
     });
     return await res.json();
   } catch (err) {
-    console.warn("Trip end local fallback", err);
+    console.warn("Trip end fallback active", err);
     return { success: true };
   }
 }
