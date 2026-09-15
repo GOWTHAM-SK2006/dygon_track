@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --brand-yellow: #ffd000;
+  --brand-yellow-hover: #e5bb00;
+  --brand-dark: #111827;
+  --brand-dark-card: #1f2937;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand-yellow: var(--brand-yellow);
+  --color-brand-yellow-hover: var(--brand-yellow-hover);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-dark-card: var(--brand-dark-card);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-dark {
+  background: rgba(17, 24, 39, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Pulse Glow Animation */
+@keyframes pulse-yellow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 208, 0, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(255, 208, 0, 0);
+  }
+}
+
+.animate-pulse-yellow {
+  animation: pulse-yellow 2s infinite;
+}
